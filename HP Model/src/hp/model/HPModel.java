@@ -58,9 +58,13 @@ public class HPModel {
 //        }
 //        return occurrences;
 //    }
+    static boolean withinBounds(int x, int y, int size) {
+        return x <= size - 1 && x >= 0 && y <= size - 1 && y >= 0;
+    }
+
     enum directions {
 
-        left, forward, right;
+        up, left, right, down;
     }
 
     @SuppressWarnings("empty-statement")
@@ -69,12 +73,13 @@ public class HPModel {
         char[][] matrix = new char[MAX][MAX];
         int score = 0;
         String chain = "";
-        String answer;
+        String answer = "";
         int scoringMethod;
-        int direction;
+        int direction = directions.up.ordinal();
         int x;
         int y;
         boolean error = false;
+        int preferred;
 
         Scanner input = new Scanner(System.in);
         String filename;
@@ -105,11 +110,22 @@ public class HPModel {
 
         matrix[MAX / 2][MAX / 2] = chain.charAt(0);
         x = y = MAX / 2;
-        direction = directions.forward.ordinal();
+        answer += 'F';
 
-        for (int i = 1; i < chain.length() && error != true; i++) {
-            if (chain.charAt(i) == 'H' && ) {
+        for (int i = 2; i < chain.length() && error != true; i++) {
+            switch (direction) {
+                case 0:
+                    if (matrix[x][y - 1] == ' ' && withinBounds(x, y - 1, MAX)) {
+                        matrix[x][y - 1] = chain.charAt(i);
+                    }
 
+                    break;
+                case 1:
+                    break;
+                case 2:
+                    break;
+                case 3:
+                    break;
             }
 
             //Counts number of times parts of "sequence" match "pattern", with "maxMutations" differences for each string in "sequences"
