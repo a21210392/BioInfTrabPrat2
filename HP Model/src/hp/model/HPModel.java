@@ -58,28 +58,109 @@ public class HPModel {
 //        }
 //        return occurrences;
 //    }
-    static boolean withinBounds(int x, int y, int size) {
-        return x <= size - 1 && x >= 0 && y <= size - 1 && y >= 0;
-    }
+    static final int MAX = 25;
 
     enum directions {
 
-        up, left, right, down;
+        F, L, R;
+    }
+
+    void printMatrix(char[][] matrix) {
+        int x;
+        int y;
+
+        for (y = MAX - 1; y >= 0; y--) {
+            for (x = 0; x < MAX; x++) {
+                System.out.print(matrix[x][y]);
+            }
+            System.out.println();
+        }
+    }
+
+    static int fillMatrix(String chain, int scoringMethod) {
+        char[][] matrix = new char[MAX][MAX];
+        String answer = "";
+        int score;
+        int x;
+        int y;
+        int i = 0;
+        int direction;
+        boolean legal = true;
+
+        for (x = 0; x < MAX; x++) {
+            for (y = 0; y < MAX; y++) {
+                matrix[x][y] = ' ';
+            }
+        }
+
+        direction = directions.F.ordinal();
+        x = MAX / 2;
+        y = MAX / 2;
+        matrix[x][y] = chain.charAt(0);
+
+        while (i < chain.length() - 1 && legal == true) {
+            if (answer[i] == E) {
+                direction--;
+                if (direction < 0) {
+                    direction = 3;
+                }
+            } else if (answer[i] == D) {
+                direction = (direction + 1) % 4;
+            }
+
+            // Actualiza coordenadas de escrita
+            switch (direction) {
+                case 0:
+                    y++;
+                    break;
+                case 1:
+                    x++;
+                    break;
+                case 2:
+                    y--;
+                    break;
+                case 3:
+                    x--;
+                    break;
+            }
+
+            if (x < 0 || x > MAX - 1 || y < 0 || y > MAX - 1 || matrix[x][y] != ' ') {
+                legal = false;
+            } else {
+                matrix[x][y] = chain.charAt(i + 1);
+                i++;
+            }
+        }
+
+        printMatrix(matrix);
+
+        if (i < chain.length() - 1) {
+            if (scoringMethod == 0) {
+                return 0;
+            } else {
+                return chain.length() - i;
+            }
+        } else {
+            score = 0;
+            for (x = 0; x < MAX; x++) {
+                for (y = 0; y < MAX; y++) {
+                    if (x < MAX - 1 && matrix[x][y] == 'H' && matrix[x + 1][y] == 'H') {
+                        score++;
+                    }
+                    if (y < MAX - 1 && matrix[x][y] == 'H' && matrix[x][y + 1] == 'H') {
+                        score++;
+                    }
+                }
+            }
+            return -score;
+        }
     }
 
     @SuppressWarnings("empty-statement")
     public static void main(String[] args) {
-        final int MAX = 25;
-        char[][] matrix = new char[MAX][MAX];
-        int score = 0;
         String chain = "";
-        String answer = "";
-        int scoringMethod;
-        int direction = directions.up.ordinal();
-        int x;
-        int y;
-        boolean error = false;
-        int preferred;
+        int scoringMethod = 0;
+        int score;
 
         Scanner input = new Scanner(System.in);
         String filename;
@@ -102,45 +183,26 @@ public class HPModel {
             System.out.println(e);
         }
 
-        for (int i = 0; i < MAX; i++) {
-            for (int j = 0; j < MAX; j++) {
-                matrix[i][j] = ' ';
-            }
+        score = fillMatrix(chain, scoringMethod);
+
+        //Counts number of times parts of "sequence" match "pattern", with "maxMutations" differences for each string in "sequences"
+        for (String sequence : sequences) {
+            occurrences += patternCounter(pattern, sequence, maxMutations, motifSize);
         }
 
-        matrix[MAX / 2][MAX / 2] = chain.charAt(0);
-        x = y = MAX / 2;
-        answer += 'F';
-
-        for (int i = 2; i < chain.length() && error != true; i++) {
-            switch (direction) {
-                case 0:
-                    if (matrix[x][y - 1] == ' ' && withinBounds(x, y - 1, MAX)) {
-                        matrix[x][y - 1] = chain.charAt(i);
-                    }
-
-                    break;
-                case 1:
-                    break;
-                case 2:
-                    break;
-                case 3:
-                    break;
-            }
-
-            //Counts number of times parts of "sequence" match "pattern", with "maxMutations" differences for each string in "sequences"
-            for (String sequence : sequences) {
-                occurrences += patternCounter(pattern, sequence, maxMutations, motifSize);
-            }
-
-            if (occurrences > score) {
-                motif = pattern;
-                score = occurrences;
-            }
+        if (occurrences > score) {
+            motif = pattern;
+            score = occurrences;
         }
+    }
 
-        System.out.println(chain);
-        System.out.println();
-        System.out.println("Score: " + score);
+    System.out.println (chain);
+
+    System.out.println ();
+
+    System.out.println (
+            
+
+"Score: " + score);
     }
 }
